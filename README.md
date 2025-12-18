@@ -30,14 +30,6 @@ The server encrypts messages before sending them, and the client decrypts them u
 - The padding `z` is removed if present.
 
 ---
-# Project Structure
-.
-├── Server.java
-├── Client.java
-├── Encryption.java
-└── README.md
-
----
 
 ## How to Run
 
