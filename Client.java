@@ -1,6 +1,7 @@
 import java.net.*;
 
 public class Client {
+
     public static void main(String[] args) {
         String serverAddress = "localhost";
         int serverPort = 4000;
@@ -8,11 +9,14 @@ public class Client {
         try {
             DatagramSocket socket = new DatagramSocket();
 
-            // Send initial packet to server
             byte[] initData = "connect".getBytes();
             DatagramPacket initPacket =
-                    new DatagramPacket(initData, initData.length,
-                            InetAddress.getByName(serverAddress), serverPort);
+                    new DatagramPacket(
+                            initData,
+                            initData.length,
+                            InetAddress.getByName(serverAddress),
+                            serverPort
+                    );
             socket.send(initPacket);
 
             System.out.println("Connected to server.");
@@ -24,14 +28,16 @@ public class Client {
 
                 socket.receive(receivePacket);
 
-                String message = new String(
-                        receivePacket.getData(), 0,
+                String encryptedMessage = new String(
+                        receivePacket.getData(),
+                        0,
                         receivePacket.getLength()
                 );
 
-                System.out.println("Server says: " + message);
+                String decryptedMessage = decryption(encryptedMessage);
+                System.out.println("Server says: " + decryptedMessage);
 
-                if (message.equalsIgnoreCase("exit")) {
+                if (decryptedMessage.equalsIgnoreCase("exit")) {
                     break;
                 }
             }
@@ -42,5 +48,28 @@ public class Client {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static String decryption(String message) {
+        if (message.length() % 2 != 0) {
+            return message;
+        }
+
+        char[] arr = message.toCharArray();
+        int n = arr.length;
+        char[] decryptedArr = new char[n];
+
+        for (int i = 0; i < n / 2; i++) {
+            decryptedArr[2 * i] = arr[i];
+            decryptedArr[2 * i + 1] = arr[i + n / 2];
+        }
+
+        String result = new String(decryptedArr);
+
+        if (result.endsWith("z")) {
+            result = result.substring(0, result.length() - 1);
+        }
+
+        return result;
     }
 }

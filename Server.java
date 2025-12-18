@@ -2,6 +2,7 @@ import java.net.*;
 import java.util.Scanner;
 
 public class Server {
+
     public static void main(String[] args) {
         int port = 4000;
 
@@ -11,7 +12,6 @@ public class Server {
 
             System.out.println("UDP Server started. Waiting for client...");
 
-            // Receive initial packet to get client address
             byte[] buffer = new byte[1024];
             DatagramPacket receivePacket =
                     new DatagramPacket(buffer, buffer.length);
@@ -26,10 +26,16 @@ public class Server {
                 System.out.print("Enter message: ");
                 String message = scanner.nextLine();
 
-                byte[] sendData = message.getBytes();
+                String encryptedMessage = encryption(message);
+
+                byte[] sendData = encryptedMessage.getBytes();
                 DatagramPacket sendPacket =
-                        new DatagramPacket(sendData, sendData.length,
-                                clientAddress, clientPort);
+                        new DatagramPacket(
+                                sendData,
+                                sendData.length,
+                                clientAddress,
+                                clientPort
+                        );
 
                 socket.send(sendPacket);
 
@@ -45,5 +51,24 @@ public class Server {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static String encryption(String message) {
+        if (message.length() % 2 != 0) {
+            message = message + "z";
+        }
+
+        char[] arr = message.toCharArray();
+        int n = arr.length;
+
+        char[] upperHalf = new char[n / 2];
+        char[] lowerHalf = new char[n / 2];
+
+        for (int i = 0; i < n / 2; i++) {
+            upperHalf[i] = arr[2 * i];
+            lowerHalf[i] = arr[2 * i + 1];
+        }
+
+        return new String(upperHalf) + new String(lowerHalf);
     }
 }
